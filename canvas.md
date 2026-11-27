@@ -1,0 +1,15 @@
+# Canvas — OLODO · Track D
+
+> Điền ở guide bước 1.4. CP1 17:00 Thứ Sáu 27/11: nộp bản đầu, đủ 7 dòng (dòng 4 được ghi giả thuyết + nguồn sẽ kiểm).
+> CP2 19:30 Thứ Sáu 27/11: cập nhật (số bằng chứng đầu, lát cắt đã chốt) và điền dòng "Đã đổi gì so với CP1".
+
+| # | Dòng | Nhóm điền |
+|---|---|---|
+| 1 | Track + lát cắt dự kiến | Track D (Thương mại điện tử · D3) — Trợ lý xử lý yêu cầu trả hàng, hoàn tiền trung lập trên Shopee và TikTok Shop |
+| 2 | Người dùng chính (một vai cụ thể — không phải "học viên nói chung") | Người mua hàng trên Shopee và TikTok Shop (đặc biệt nhóm mua ngành thời trang/hàng giá trị cao gặp sự cố sau khi nhận hàng) |
+| 3 | Pain một câu: ai — đang làm gì — vướng đâu — hậu quả | Người mua trên Shopee và TikTok Shop khi nhận hàng sai kích cỡ, không khớp mô tả, giao sai/thiếu hoặc hư hỏng phải tự đối chiếu quy định trả hàng khác nhau giữa hai sàn và cung cấp đúng bằng chứng trong thời hạn ngắn; nếu gửi thiếu căn cứ hoặc bị đối chiếu sai mô tả thì mất tiền giữ hàng lỗi, còn duyệt hoàn cảm tính thì người bán mất trắng hàng và chịu thêm phí ship hoàn. |
+| 4 | Bằng chứng đầu — CP1: giả thuyết + nguồn sẽ kiểm · CP2: số đầu tiên + 1 trích dẫn | Giả thuyết: Trả hàng/hoàn tiền sau giao là điểm đau tốn kém và gây tranh chấp cao nhất cho cả người mua lẫn người bán trên hai sàn. Nguồn kiểm chứng: (1) Đào 127.546 dòng đơn thật từ bộ `vietnam_ecommerce` trên Xóm Dataset (25.546 Shopee + 102.000 TikTok Shop — ghi nhận 2.471 dòng trả hàng sau giao ~703 triệu GMV, 873 dòng Shopee âm tiền về, 24,5 triệu phí ship hoàn; 44,6% ca TikTok là sai size/không khớp mô tả; 1,8% người mua hoàn ≥2 lần chiếm 45,6% ca hoàn Shopee); (2) Phỏng vấn ≥3 và khảo sát ≥20 người mua Shopee/TikTok ngoài nhóm trong lớp L3. |
+| 5 | **Lát cắt MỘT CÂU** (1 người dùng · 1 việc · 1 quyết định AI · 1 kết quả) | Một người mua trên Shopee hoặc TikTok Shop · gửi yêu cầu trả hàng/hoàn tiền khi đơn sau giao gặp sự cố (sai size, không khớp mô tả, gửi sai/thiếu, hư hỏng hoặc đổi ý) · AI đối chiếu đơn hàng, mô tả sản phẩm lúc đặt, hạn trả hàng theo sàn, lịch sử hoàn và bằng chứng hai bên để quyết định hướng dẫn trả hàng hợp lệ, yêu cầu bổ sung bằng chứng hay chuyển nhân viên sàn · người mua biết rõ quyền lợi và bước tiếp theo, người bán không bị xử thua oan khi họ giao đúng. |
+| 6 | AI tự làm đến đâu + 1 dòng lý do: sai thì ai chịu gì | AI tự làm khi chắc (hướng dẫn trả hàng trong hạn mức/chính sách hoặc yêu cầu bổ sung bằng chứng), chuyển nhân viên sàn khi không chắc hoặc rủi ro cao (vượt hạn mức, nghi hàng giả, tranh chấp phức tạp, tài khoản hoàn lặp lại nhiều lần) — vì quyết định hoàn tiền hoặc đóng khiếu nại rất khó đảo ngược (hoàn oan thì shop mất hàng và âm tiền về; từ chối sai thì người mua mất tiền và niềm tin). |
+| 7 | Phân công có tên | Cả nhóm cùng khảo sát/phỏng vấn và rà mạch câu chuyện; chia 2 cặp: Bình (Đội trưởng) + Huy phụ trách đào data `vietnam_ecommerce`, thiết kế kiến trúc & bản chạy thử; Long + Dũng phụ trách phỏng vấn/khảo sát người mua, bộ câu thử/metric, mô phỏng chi phí và slide demo. |
+| — | *(CP2)* Đã đổi gì so với CP1 | |
