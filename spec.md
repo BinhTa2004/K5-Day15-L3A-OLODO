@@ -112,9 +112,9 @@ flowchart TD
 | **G1/G2 — Nói rõ giới hạn thẩm quyền** | Bước 5 nêu rõ AI chỉ hướng dẫn/kiểm tra điều kiện trong hạn mức `300.000đ`, không có quyền khoá shop hay bồi thường ngoài đơn |
 | **G8/G9 — Dễ bỏ qua / chuyển người khi không đồng ý** | Ở mọi ca tranh chấp (kể cả khi mô tả khớp hàng nhưng khách không đồng ý), luôn mở đường chuyển nhân viên sàn kiểm tra lại |
 
-- **Phần nào thật, phần nào giả (tại CP2):**
-  - **Đã chạy thật ở CP2:** Toàn bộ luồng workflow trong `codebase/agent.py`, 6 công cụ và bộ kiểm quy tắc/chặn rủi ro trong `codebase/tools.py` đọc trên `data/orders.json` (`synthetic`, `seed=42`) & `data/policies.json`.
-  - **Còn giả ở CP2:** `call_model` trong `codebase/ai.py` đang chạy chế độ `fake` (model `"fake"`, token `0`) đúng theo hướng dẫn CP2; sẽ nối API model thật trước CP3.
+- **Phần nào thật, phần nào giả (cập nhật CP3):**
+  - **Đã chạy thật ở CP3:** `call_model` đã nối AI thật (`ollama` · `gpt-oss:20b` trong `codebase/ai.py`), chạy qua toàn bộ luồng workflow cố định trong `codebase/agent.py`, 6 công cụ và bộ kiểm quy tắc/chặn rủi ro trong `codebase/tools.py`, kèm Web UI 2 góc nhìn (`codebase/web_ui.py`) và Session Memory.
+  - **Còn giả / bản nháp:** `data/orders.json` (`synthetic`, `seed=42`) & `data/policies.json` là dữ liệu giả lập sạch theo phân phối thật `vietnam_ecommerce`, và `escalate_to_human` xuất bản nháp `ESC-ORD-...` (chưa ghi ra hệ thống Shopee / TikTok thật).
 
 ---
 
@@ -179,3 +179,4 @@ flowchart TD
 |---|---|---|
 | 28/11/2026 00:05 | Hoàn thiện `evidence/summary.md`, `evidence/survey/results.csv` (`n=32`), cập nhật số liệu thật từ khảo sát vào §1 & §2 (thời gian TB `10,76 phút/ca`, tần suất `0,54 lần/tháng` nhóm từng gặp sự cố, `28,0%` kết quả tiêu cực). Không sửa §7. | Bổ sung Nguồn 2 (`evidence/survey/results.csv`) kiểm lại Nguồn 1 (`vietnam_ecommerce`), thay thế số tự ước tính ở §2 bằng số liệu khảo sát thật. |
 | 28/11/2026 00:48 | Bỏ phụ thuộc `issue_hint` ở `codebase/tools.py`, thêm chặn PII sớm trước bước mã đơn & Session Memory (`history=None` mặc định cho eval) ở `codebase/agent.py`, dựng Web UI Demo 2 tab (`codebase/web_ui.py`), thêm kết nối đa hãng `codebase/ai.py`, mở rộng `eval/benchmark.csv` 15→25 câu và thêm `eval/code_grader.py`. Không sửa §7 hay `metric_spec.yaml`. | Nâng cao độ trung thực kỹ thuật trước khi chạy Lượt 1 AI thật; bổ sung 10 câu thử từ kết quả khảo sát `n=32` (`S14, S18, S22`) và ca mã đơn không tồn tại `ORD-999`; dựng UI trực quan cho người dùng thử và Demo Zone. |
+| 28/11/2026 01:40 | Đồng bộ kết quả Lượt 1 `run-1@20261128-011859` (`gpt-oss:20b` qua Ollama Cloud) từ nhánh `eval-benchmark-1`, chấm đủ 25/25 câu (`20/25 = 80,0%`, `thuong 9/10`, `kho 8/10`, `tu_choi 3/5` — **Chưa đạt chuẩn**), cập nhật `eval/README.md` §5, `README.md`, `spec.md` §4 và dọn `evidence/survey/result.xlsx`. Không sửa §7 hay `metric_spec.yaml`. | Lượt 1 lộ 4 nhóm lỗi làm căn cứ sửa cho Lượt 2: (1) `D19` thiếu chặn PII khi không kèm mã đơn, (2) `D09/D10` đối chiếu sai/thiếu chi tiết `listing_at_order` và bịa phí, (3) `D06/D18` trả lời bằng tiếng Anh, (4) lộ flag nội bộ (`expired_return_window`, `need_evidence`) và thiếu mã phiếu `ESC-ORD-...` ở `D11/D13`. |

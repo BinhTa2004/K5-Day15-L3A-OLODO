@@ -81,14 +81,15 @@ Nhóm dùng stack khác (Node, Streamlit, notebook…): sửa hàm `run_app()` t
 
 | Thành phần | Thật / Giả | Ghi chú |
 |---|---|---|
-| Lời gọi AI ở quyết định trung tâm | **Thật** (bắt buộc từ CP3) | Model: ____ |
-|  |  |  |
+| Lời gọi AI ở quyết định trung tâm | **Thật** (bắt buộc từ CP3) | Model: `gpt-oss:20b` (qua Ollama Cloud trong `codebase/ai.py`) |
+| Luồng workflow, 6 công cụ, bộ chặn quy tắc, Web UI 2 góc nhìn | **Thật** | `codebase/agent.py`, `codebase/tools.py`, `codebase/web_ui.py` |
+| Dữ liệu đơn hàng mẫu & phiếu chuyển nhân viên | **Giả lập sạch** | `data/orders.json` sinh `seed=42` theo phân phối thật `vietnam_ecommerce`, 0 PII; `escalate_to_human` xuất bản nháp `ESC-ORD-...`, chưa ghi hệ thống sàn thật |
 
 ## Dùng AI vào việc gì
 
 2–3 dòng (bắt buộc): nhóm dùng công cụ AI nào để làm gì, người kiểm lại phần nào. Chi tiết: [docs/ai-usage.md](docs/ai-usage.md). Coding agent đọc [AGENTS.md](AGENTS.md).
 
-____
+Nhóm dùng coding agent hỗ trợ viết khung code (`codebase/agent.py`, `tools.py`, `ai.py`, `web_ui.py`), script SQL khám phá dữ liệu (`evidence/count_xomdata.sql`) và rà lỗi kỹ thuật. Toàn bộ số liệu bằng chứng (`vietnam_ecommerce` + khảo sát `n=32`), lựa chọn lát cắt, chuẩn metric/câu thử và chấm cột `pass` trong `eval/run-1.csv` đều do thành viên nhóm kiểm chứng trực tiếp và chịu trách nhiệm.
 
 ## File mẫu — điền ở bước nào
 
@@ -120,5 +121,5 @@ ____
 | 4 | Bản chạy thử làm trọn lát cắt | `codebase/` · lệnh ở mục "Lệnh" |
 | 5 | Định nghĩa "tốt" + bộ câu thử | `data/DATA_CARD.md` · `eval/` |
 | 6 | Mô phỏng chi phí khi dùng thật | `cost/` |
-| 7 | Slide + demo + video dự phòng | `demo-slides.pdf` ở thư mục gốc · link video: ____ |
+| 7 | Slide + demo + video dự phòng | `demo-slides.pdf` ở thư mục gốc · link video (CP3 · AI thật 33s): https://drive.google.com/file/d/11hyOe3ZUYoBXLiIFM1CGLK9BMURSqhC3/view?usp=drive_link |
 | + | *Bonus:* người dùng thử | `validation/log.md` |

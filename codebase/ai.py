@@ -110,13 +110,18 @@ def _call_anthropic(system: str, user: str) -> dict:
 
 
 def _call_ollama(system: str, user: str) -> dict:
-    url = API_BASE_URL or "http://localhost:11434/api/chat"
+    """Có API_KEY → Ollama Cloud (ollama.com); không có → Ollama chạy trên máy."""
+    default_url = "https://ollama.com/api/chat" if API_KEY else "http://localhost:11434/api/chat"
+    url = API_BASE_URL or default_url
+    headers = {"Authorization": "Bearer " + API_KEY} if API_KEY else {}
     messages = ([{"role": "system", "content": system}] if system else []) + [{"role": "user", "content": user}]
-    data = post_json(url, {}, {"model": MODEL_NAME, "messages": messages, "stream": False}, timeout=300)
+    data = post_json(url, headers, {"model": MODEL_NAME, "messages": messages, "stream": False}, timeout=300)
+    if "prompt_eval_count" not in data or "eval_count" not in data:
+        raise RuntimeError("Phản hồi Ollama thiếu trường token (prompt_eval_count / eval_count).")
     return {
         "text": data["message"]["content"],
-        "tokens_in": int(data.get("prompt_eval_count", 0)),
-        "tokens_out": int(data.get("eval_count", 0)),
+        "tokens_in": int(data["prompt_eval_count"]),
+        "tokens_out": int(data["eval_count"]),
     }
 
 
