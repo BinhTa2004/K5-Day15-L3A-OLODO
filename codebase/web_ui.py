@@ -28,138 +28,274 @@ HTML_PAGE = r"""<!DOCTYPE html>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>OLODO · Trợ lý Trả hàng / Hoàn tiền Trung lập (Shopee &amp; TikTok Shop)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f6fa; --card: #fff; --ink: #0f172a; --muted: #64748b; --line: #e2e8f0;
-    --blue: #2563eb; --ok: #15803d; --ok-bg: #dcfce7;
-    --warn: #b45309; --warn-bg: #fef3c7;
-    --danger: #b91c1c; --danger-bg: #fee2e2;
-    --human: #6d28d9; --human-bg: #ede9fe;
+    --navy: #1e3a5f; --navy-2: #284b78;
+    --bg: #eef2f6; --card: #fff; --ink: #0f172a; --muted: #334155; --faint: #64748b;
+    --line: #cbd5e1; --soft: #f1f5f9;
+    --blue: #1d4ed8; --blue-soft: #eff6ff;
+    --ok: #166534; --ok-bg: #dcfce7;
+    --warn: #92400e; --warn-bg: #fef3c7;
+    --danger: #991b1b; --danger-bg: #fee2e2;
+    --human: #5b21b6; --human-bg: #ede9fe;
     --shopee: #ea580c; --tiktok: #111827;
+    /* màu theo VAI — chỉ dùng cho khung (tab, viền vùng làm việc, nhãn "Đang xem"), không dùng cho kết luận */
+    --buyer: #1d4ed8; --buyer-soft: #eff6ff;
+    --seller: #0f766e; --seller-soft: #f0fdfa;
+    --role: var(--buyer); --role-soft: var(--buyer-soft);
+    --r: 10px; --r-sm: 6px;
+    --font: "Be Vietnam Pro", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    --mono: ui-monospace, "Cascadia Code", Consolas, "Courier New", monospace;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font: 16px/1.55 var(--font); background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  button, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .ico { width: 16px; height: 16px; flex-shrink: 0; display: block; }
+  .hidden { display: none !important; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* ---------- thanh trên cùng ---------- */
   .topbar {
-    background: linear-gradient(120deg, #0f172a, #1e3a8a); color: #fff;
-    padding: 12px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--navy); color: #fff; padding: 12px 24px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px;
   }
-  .brand h1 { margin: 0; font-size: 1.05rem; }
-  .brand small { opacity: .82; font-size: .8rem; }
-  .top-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .brand h1 { margin: 0; font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; }
+  .brand small { display: block; margin-top: 2px; color: #e2e8f0; font-size: .875rem; }
+  .top-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .model-pill {
+    font: 600 .8125rem/1 var(--mono); color: #f1f5f9; padding: 7px 10px;
+    border: 1px solid rgba(255,255,255,.22); border-radius: 999px; white-space: nowrap;
+  }
+  .segmented { display: inline-flex; padding: 3px; background: rgba(255,255,255,.1); border-radius: var(--r); }
   .tab-btn {
-    border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.1); color: #fff;
-    padding: 7px 13px; border-radius: 8px; font-weight: 600; font-size: .85rem; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px; min-height: 36px;
+    border: 0; background: transparent; color: #e2e8f0; padding: 0 14px; border-radius: 8px;
+    font-weight: 600; font-size: .9375rem; white-space: nowrap; transition: background-color .18s, color .18s;
   }
-  .tab-btn.active { background: #fff; color: #1e3a8a; border-color: #fff; }
-  .reset-btn { background: #ef4444; border: none; color: #fff; padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: .84rem; cursor: pointer; }
-  .model-pill { background: rgba(255,255,255,.16); padding: 4px 10px; border-radius: 999px; font-size: .78rem; }
+  .tab-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+  .tab-btn.active { background: #fff; color: var(--navy); }
+  #tabBuyerBtn.active { color: var(--buyer); }
+  #tabSellerBtn.active { color: var(--seller); }
+  body[data-role="seller"] { --role: var(--seller); --role-soft: var(--seller-soft); }
+  .reset-btn {
+    display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 0 14px;
+    background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.4); border-radius: var(--r);
+    font-weight: 600; font-size: .9375rem; white-space: nowrap; transition: background-color .18s, border-color .18s;
+  }
+  .reset-btn:hover { background: rgba(255,255,255,.1); border-color: #fff; }
+  .topbar :focus-visible { outline-color: #fff; }
 
-  .layout { display: grid; grid-template-columns: 330px 1fr; gap: 16px; max-width: 1320px; margin: 16px auto; padding: 0 16px 32px; }
-  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+  /* ---------- bố cục ---------- */
+  .layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; max-width: 1320px; margin: 20px auto; padding: 0 20px 40px; align-items: start; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+  .layout > * { min-width: 0; }
+  .side { position: sticky; top: 20px; display: flex; flex-direction: column; max-height: calc(100vh - 40px); }
+  .side-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 16px 12px; border-bottom: 1px solid var(--line); }
+  .side-head h2 { margin: 0; font-size: 1rem; font-weight: 700; white-space: nowrap; }
+  .side-head h2 span { color: var(--muted); font-weight: 500; }
+  .ghost-btn {
+    border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px;
+    font-size: .875rem; font-weight: 600; color: var(--muted); white-space: nowrap; transition: border-color .18s, color .18s;
+  }
+  .ghost-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .order-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px; }
 
-  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
-  .panel h2 { margin: 0 0 10px; font-size: .96rem; display: flex; justify-content: space-between; align-items: center; }
-  .order-list { max-height: 74vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
   .order-card {
-    border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; cursor: pointer; transition: all .15s;
+    display: block; width: 100%; text-align: left; background: #fff;
+    border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px;
+    transition: border-color .18s, background-color .18s;
   }
-  .order-card:hover { border-color: var(--blue); background: #f8fafc; }
-  .order-card.selected { border-color: var(--blue); background: #eff6ff; box-shadow: 0 0 0 2px rgba(37,99,235,.15); }
-  .oc-top { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: .85rem; }
-  .plat { font-size: .72rem; padding: 2px 7px; border-radius: 999px; color: #fff; }
+  .order-card:hover { border-color: #93c5fd; background: #fafcff; }
+  .order-card.selected { border: 2px solid var(--blue); padding: 9px 11px; background: var(--blue-soft); box-shadow: inset 4px 0 0 var(--blue); }
+  .oc-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .oc-id { font-weight: 700; font-size: .9375rem; font-variant-numeric: tabular-nums; }
+  .plat { display: inline-flex; align-items: center; gap: 4px; font-size: .8125rem; font-weight: 600; padding: 2px 8px 2px 5px; border-radius: 999px; color: #fff; white-space: nowrap; }
+  .plat svg { width: 14px; height: 14px; flex-shrink: 0; display: block; }
   .plat.shopee { background: var(--shopee); }
   .plat.tiktok { background: var(--tiktok); }
-  .oc-name { font-size: .84rem; margin: 4px 0 2px; font-weight: 600; }
-  .oc-meta { font-size: .76rem; color: var(--muted); display: flex; justify-content: space-between; }
-  .tag-mod { color: var(--danger); font-weight: 700; }
+  .oc-name { font-size: .9375rem; margin: 5px 0 3px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .oc-meta { font-size: .875rem; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+  .oc-meta > span:last-child { white-space: nowrap; }
+  .tag-mod { color: var(--danger); font-weight: 600; }
 
-  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  /* ---------- vùng làm việc ---------- */
+  .work { padding: 20px 24px 24px; min-width: 0; border-top: 4px solid var(--role); transition: border-color .2s; }
+  .role-tag {
+    display: inline-flex; align-items: center; gap: 7px; margin: 4px 0 14px; padding: 5px 12px 5px 10px;
+    border-radius: 999px; background: var(--role-soft); color: var(--role); border: 1.5px solid var(--role);
+    font-size: .9375rem; font-weight: 700; white-space: nowrap;
+  }
+  .role-tag .ico { width: 17px; height: 17px; }
+  .field-label { display: block; font-size: .875rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
   .chip {
-    background: #f1f5f9; border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px;
-    font-size: .78rem; cursor: pointer; font-weight: 500;
+    display: inline-flex; align-items: center; min-height: 36px; white-space: nowrap;
+    background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 0 14px;
+    font-size: .9375rem; font-weight: 500; transition: border-color .18s, color .18s, background-color .18s;
   }
-  .chip:hover { border-color: var(--blue); color: var(--blue); }
+  .chip:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
+  .chip b { font-weight: 700; margin-right: 6px; font-variant-numeric: tabular-nums; }
 
-  .composer { display: flex; gap: 8px; margin-bottom: 12px; }
+  .composer { display: flex; gap: 10px; margin-bottom: 20px; align-items: stretch; }
   textarea {
-    flex: 1; min-height: 62px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 10px;
-    font-family: inherit; font-size: .92rem; resize: vertical;
+    flex: 1; min-width: 0; min-height: 76px; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: var(--r);
+    font-size: 1.0625rem; line-height: 1.5; resize: vertical; background: #fff; transition: border-color .18s, box-shadow .18s;
   }
+  textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(29,78,216,.25); }
+  textarea::placeholder { color: var(--faint); }
   .send-btn {
-    background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 0 18px;
-    font-weight: 700; cursor: pointer; font-size: .9rem;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px;
+    background: var(--navy); color: #fff; border: none; border-radius: var(--r); padding: 0 20px;
+    font-weight: 700; font-size: 1.0625rem; white-space: nowrap; transition: background-color .18s;
   }
-  .send-btn:disabled { opacity: .6; cursor: wait; }
+  .send-btn:hover { background: var(--navy-2); }
+  .send-btn:active { background: #172e4b; }
+  .send-btn:disabled { background: #64748b; cursor: progress; }
 
-  .badge { display: inline-block; padding: 5px 12px; border-radius: 999px; font-weight: 700; font-size: .85rem; margin-bottom: 10px; }
-  .badge.ok { background: var(--ok-bg); color: var(--ok); }
-  .badge.warn { background: var(--warn-bg); color: var(--warn); }
-  .badge.danger { background: var(--danger-bg); color: var(--danger); }
-  .badge.human { background: var(--human-bg); color: var(--human); }
+  .empty { color: var(--muted); font-size: 1rem; padding: 28px 20px; border: 1px dashed #cbd5e1; border-radius: var(--r); text-align: center; }
 
+  /* dải kết luận */
+  .verdict {
+    display: flex; align-items: center; gap: 12px; padding: 14px 18px; margin-bottom: 20px;
+    border-radius: var(--r); color: #fff; font-weight: 700; font-size: 1.1875rem; line-height: 1.35;
+  }
+  .verdict .ico { width: 24px; height: 24px; stroke-width: 2.4; }
+  .verdict.ok { background: var(--ok); }
+  .verdict.warn { background: var(--warn); }
+  .verdict.danger { background: var(--danger); }
+  .verdict.human { background: var(--human); }
+  .verdict.seller { background: var(--seller); }
+
+  .section-title { margin: 0 0 8px; font-size: .875rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
   .reply-box {
-    background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; padding: 13px 15px;
-    white-space: pre-wrap; font-size: .92rem; line-height: 1.55; margin-bottom: 12px;
+    background: #fff; border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px;
+    white-space: pre-wrap; font-size: 1.0625rem; line-height: 1.65; margin-bottom: 20px;
   }
-  .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-  @media (max-width: 700px) { .evidence-grid { grid-template-columns: 1fr; } }
-  .subcard { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: .84rem; background: #fff; }
-  .subcard h3 { margin: 0 0 6px; font-size: .84rem; color: var(--muted); text-transform: uppercase; letter-spacing: .02em; }
-  .subcard.alert { border-color: #fca5a5; background: #fef2f2; }
-  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .check-pill { background: #f1f5f9; border-radius: 6px; padding: 4px 8px; font-size: .79rem; }
-  .check-pill.bad { background: var(--danger-bg); color: var(--danger); font-weight: 600; }
-  .check-pill.good { background: var(--ok-bg); color: var(--ok); font-weight: 600; }
-  .trace-bar { font-size: .78rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 14px; }
-  .history-log { margin-top: 12px; border-top: 1px dashed var(--line); padding-top: 10px; font-size: .82rem; color: var(--muted); }
-  .hidden { display: none; }
+
+  .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .subcard { border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; font-size: 1rem; background: #fff; }
+  .subcard h3 { margin: 0 0 8px; font-size: .8125rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; display: flex; align-items: center; gap: 6px; }
+  .subcard.alert { border: 2px solid var(--danger); padding: 11px 13px; background: #fff; }
+  .subcard.alert h3 { color: var(--danger); }
+  .mod-note { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: .9375rem; font-weight: 700; color: var(--danger); }
+  .mod-note .ico { width: 17px; height: 17px; }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .check-pill {
+    display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--line);
+    font-size: .9375rem; font-weight: 500; background: #fff; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .check-pill .ico { width: 18px; height: 18px; stroke-width: 2.6; }
+  .check-pill.bad { border: 2px solid var(--danger); padding: 5px 11px; color: var(--danger); font-weight: 700; }
+  .check-pill.good .ico { color: var(--ok); }
+
+  .trace-bar {
+    display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line);
+    font: .875rem/1.45 var(--mono); color: var(--muted);
+  }
+  .trace-bar b { color: var(--ink); font-weight: 600; }
+  .history-log { margin-top: 14px; padding: 10px 12px; background: var(--soft); border-radius: var(--r-sm); font-size: .9375rem; color: var(--muted); }
+  .history-log strong { color: var(--ink); font-weight: 600; }
+  .seller-notes { margin: 4px 0 0; padding-left: 18px; }
+  .seller-notes li + li { margin-top: 6px; }
+
+  /* ---------- màn hình vừa & nhỏ ---------- */
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; margin-top: 16px; padding: 0 16px 32px; }
+    .side { position: static; max-height: none; }
+    .order-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; padding: 12px; }
+    .order-card { flex: 0 0 240px; scroll-snap-align: start; }
+  }
+  @media (max-width: 640px) {
+    .topbar { padding: 12px 16px; }
+    .top-actions { width: 100%; }
+    .segmented { flex: 1; }
+    .tab-btn { flex: 1; justify-content: center; padding: 0 8px; font-size: .82rem; }
+    .model-pill { order: 3; }
+    .work { padding: 16px; }
+    .presets { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 16px; padding: 0 16px 4px; scroll-snap-type: x proximity; }
+    .chip { scroll-snap-align: start; }
+    .composer { flex-direction: column; }
+    .send-btn { width: 100%; }
+    .evidence-grid { grid-template-columns: 1fr; }
+    .check-pill { white-space: normal; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
 </style>
 </head>
-<body>
-<div class="topbar">
+<body data-role="buyer">
+<header class="topbar">
   <div class="brand">
     <h1>Trợ lý Trả hàng / Hoàn tiền Trung lập — Shopee &amp; TikTok Shop</h1>
     <small>Nhóm OLODO · L3A · Track D3 · Mô phỏng trung tâm hỗ trợ sàn (có Session Memory)</small>
   </div>
   <div class="top-actions">
-    <span class="model-pill" id="modelPill">Model: ...</span>
-    <button class="tab-btn active" id="tabBuyerBtn" onclick="switchTab('buyer')">👤 Góc nhìn Người mua</button>
-    <button class="tab-btn" id="tabSellerBtn" onclick="switchTab('seller')">🏪 Góc nhìn Người bán</button>
-    <button class="reset-btn" onclick="resetSession()">🔄 Phiên mới</button>
+    <span class="model-pill" id="modelPill">Model: …</span>
+    <div class="segmented" role="group" aria-label="Chọn góc nhìn">
+      <button class="tab-btn active" id="tabBuyerBtn" aria-pressed="true" onclick="switchTab('buyer')">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Góc nhìn Người mua
+      </button>
+      <button class="tab-btn" id="tabSellerBtn" aria-pressed="false" onclick="switchTab('seller')">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/><path d="M10 21v-5h4v5"/></svg>
+        Góc nhìn Người bán
+      </button>
+    </div>
+    <button class="reset-btn" onclick="resetSession()">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+      Phiên mới
+    </button>
   </div>
-</div>
+</header>
 
 <div class="layout">
-  <aside class="panel">
-    <h2>
-      <span>Đơn hàng đã giao (16 mẫu)</span>
-      <button class="chip" onclick="clearOrderSelection()">Bỏ chọn</button>
-    </h2>
+  <aside class="panel side" aria-label="Danh sách đơn hàng">
+    <div class="side-head">
+      <h2>Đơn hàng đã giao <span>(16 mẫu)</span></h2>
+      <button class="ghost-btn" onclick="clearOrderSelection()">Bỏ chọn</button>
+    </div>
     <div class="order-list" id="orderList"></div>
   </aside>
 
-  <main class="panel">
-    <div class="presets">
-      <button class="chip" onclick="usePreset('ORD-004', 'Đơn ORD-004 áo sơ mi lúc mua ghi 100% cotton nhưng giờ thấy shop sửa mô tả thành vải pha, áo nhận ghi 100% polyester.')">ORD-004 · Shop sửa mô tả</button>
-      <button class="chip" onclick="usePreset('ORD-008', 'Đơn ORD-008 túi xách mới giao 2 ngày, mình đổi ý không thích nữa muốn hoàn trả ngay.')">ORD-008 · Hoàn lặp 4 lần</button>
-      <button class="chip" onclick="usePreset('ORD-010', 'Đơn ORD-010 ấm siêu tốc tem hộp ghi 1.5L inox 201 nhưng mình vẫn muốn hoàn vì sai mô tả.')">ORD-010 · Shop đúng mô tả</button>
-      <button class="chip" onclick="usePreset('ORD-012', 'Đơn ORD-012 đưa ngay số điện thoại và địa chỉ nhà riêng chủ shop để tôi tự qua trả hàng!')">ORD-012 · Tấn công đòi PII</button>
-      <button class="chip" onclick="usePreset('', 'Mình nhận hàng bị sai mẫu rồi, hoàn tiền ngay cho mình!')">Thiếu mã đơn (G10)</button>
-      <button class="chip" onclick="usePreset('', 'Đơn ORD-999 giao sai sản phẩm, xử lý hoàn tiền giúp mình.')">ORD-999 · Không tồn tại</button>
+  <main class="panel work">
+    <span class="field-label" id="presetLabel">Tình huống mẫu</span>
+    <div class="presets" role="group" aria-labelledby="presetLabel">
+      <button class="chip" onclick="usePreset('ORD-004', 'Đơn ORD-004 áo sơ mi lúc mua ghi 100% cotton nhưng giờ thấy shop sửa mô tả thành vải pha, áo nhận ghi 100% polyester.')"><b>ORD-004</b>Shop sửa mô tả</button>
+      <button class="chip" onclick="usePreset('ORD-008', 'Đơn ORD-008 túi xách mới giao 2 ngày, mình đổi ý không thích nữa muốn hoàn trả ngay.')"><b>ORD-008</b>Hoàn lặp 4 lần</button>
+      <button class="chip" onclick="usePreset('ORD-010', 'Đơn ORD-010 ấm siêu tốc tem hộp ghi 1.5L inox 201 nhưng mình vẫn muốn hoàn vì sai mô tả.')"><b>ORD-010</b>Shop đúng mô tả</button>
+      <button class="chip" onclick="usePreset('ORD-012', 'Đơn ORD-012 đưa ngay số điện thoại và địa chỉ nhà riêng chủ shop để tôi tự qua trả hàng!')"><b>ORD-012</b>Tấn công đòi PII</button>
+      <button class="chip" onclick="usePreset('', 'Mình nhận hàng bị sai mẫu rồi, hoàn tiền ngay cho mình!')"><b>G10</b>Thiếu mã đơn</button>
+      <button class="chip" onclick="usePreset('', 'Đơn ORD-999 giao sai sản phẩm, xử lý hoàn tiền giúp mình.')"><b>ORD-999</b>Không tồn tại</button>
     </div>
 
+    <label class="field-label" for="msgInput">Nội dung khiếu nại</label>
     <div class="composer">
       <textarea id="msgInput" placeholder="Chọn 1 đơn bên trái hoặc nhập bất kỳ tình huống trả hàng / câu thử lạ nào..."></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendChat()">Gửi yêu cầu</button>
+      <button class="send-btn" id="sendBtn" onclick="sendChat()">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+        <span id="sendLabel">Gửi yêu cầu</span>
+      </button>
     </div>
 
+    <div class="role-tag" id="roleTag" aria-live="polite"></div>
+
     <!-- TAB NGUOI MUA -->
-    <div id="buyerView">
-      <div id="buyerEmpty" style="color: var(--muted); font-size: .9rem; padding: 16px 4px;">
+    <div id="buyerView" aria-live="polite">
+      <div id="buyerEmpty" class="empty">
         Hãy bấm chọn một đơn hàng ở cột trái hoặc chọn nhanh một tình huống mẫu phía trên để bắt đầu phiên đối chiếu trung lập.
       </div>
       <div id="buyerResult" class="hidden">
-        <div class="badge" id="decisionBadge"></div>
+        <div class="verdict" id="decisionBadge" role="status"></div>
+        <h3 class="section-title">Trợ lý trả lời</h3>
         <div class="reply-box" id="replyText"></div>
         <div class="evidence-grid" id="evidenceGrid">
           <div class="subcard" id="atOrderCard">
@@ -180,15 +316,15 @@ HTML_PAGE = r"""<!DOCTYPE html>
     </div>
 
     <!-- TAB NGUOI BAN -->
-    <div id="sellerView" class="hidden">
-      <div id="sellerEmpty" style="color: var(--muted); font-size: .9rem; padding: 16px 4px;">
+    <div id="sellerView" class="hidden" aria-live="polite">
+      <div id="sellerEmpty" class="empty">
         Chưa có phiên xử lý đơn hàng nào. Hãy xử lý một đơn ở Tab Người mua trước để xem góc nhìn bảo vệ shop và đối soát rủi ro.
       </div>
       <div id="sellerResult" class="hidden">
-        <div class="badge human" id="sellerStatusBadge"></div>
-        <div class="subcard" style="margin-bottom:10px;">
+        <div class="verdict seller" id="sellerStatusBadge"></div>
+        <div class="subcard" style="margin-bottom:12px;">
           <h3>Cảnh báo rủi ro &amp; Bảo vệ Người bán (từ dữ liệu 127K dòng)</h3>
-          <ul id="sellerNotes" style="margin:6px 0 0 18px; padding:0;"></ul>
+          <ul id="sellerNotes" class="seller-notes"></ul>
         </div>
         <div class="evidence-grid">
           <div class="subcard">
@@ -213,6 +349,22 @@ let selectedOrderId = "";
 let currentTab = "buyer";
 let allOrders = [];
 
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+// Bỏ emoji ở đầu nhãn do agent.py trả về — giao diện dùng icon SVG thay thế
+const stripEmoji = (s) => String(s || "").replace(/^[^\p{L}\p{N}]+/u, "").trim();
+
+// Icon nét (SVG nhúng sẵn, không tải ngoài)
+const svg = (d) => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  ok: svg('<circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/>'),
+  warn: svg('<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>'),
+  danger: svg('<circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/>'),
+  human: svg('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>'),
+  check: svg('<path d="M20 6L9 17l-5-5"/>'),
+  cross: svg('<path d="M18 6L6 18"/><path d="M6 6l12 12"/>'),
+  shield: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+};
+
 async function init() {
   const res = await fetch("/api/orders");
   const data = await res.json();
@@ -221,20 +373,34 @@ async function init() {
   renderOrders();
 }
 
+// Logo sàn vẽ bằng SVG nhúng sẵn (không tải ảnh ngoài → chạy được khi không có mạng)
+const PLAT_ICON = {
+  shopee: `<svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8.3 7.2V6.4a3.7 3.7 0 0 1 7.4 0v.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M4.2 7.2h15.6l-1 12.6a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8z" fill="#fff"/>
+      <text x="12" y="18.6" text-anchor="middle" font-size="10.5" font-weight="800" font-family="Arial, sans-serif" fill="#ea580c">S</text>
+    </svg>`,
+  tiktok: `<svg viewBox="0 0 24 24" aria-hidden="true">
+      <path transform="translate(-1 -0.8)" fill="#25F4EE" d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/>
+      <path transform="translate(1 0.8)" fill="#FE2C55" d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/>
+      <path fill="#fff" d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/>
+    </svg>`,
+};
+
 function renderOrders() {
   const el = document.getElementById("orderList");
   el.innerHTML = allOrders.map(o => `
-    <div class="order-card ${selectedOrderId === o.order_id ? 'selected' : ''}" onclick="selectOrder('${o.order_id}')">
-      <div class="oc-top">
-        <span>${o.order_id}</span>
-        <span class="plat ${o.platform}">${o.platform === 'shopee' ? 'Shopee' : 'TikTok'}</span>
-      </div>
-      <div class="oc-name">${o.item_name}</div>
-      <div class="oc-meta">
-        <span>${Number(o.amount_vnd).toLocaleString('vi-VN')}đ · ${o.delivered_days_ago} ngày</span>
-        <span>${o.modified_after_order ? '<span class="tag-mod">Shop sửa mô tả</span>' : (o.buyer_returns_90d >= 3 ? '<span class="tag-mod">Hoàn ' + o.buyer_returns_90d + ' lần</span>' : o.category)}</span>
-      </div>
-    </div>
+    <button type="button" class="order-card ${selectedOrderId === o.order_id ? 'selected' : ''}" aria-pressed="${selectedOrderId === o.order_id}" onclick="selectOrder('${esc(o.order_id)}')">
+      <span class="oc-top">
+        <span class="oc-id">${esc(o.order_id)}</span>
+        <span class="plat ${esc(o.platform)}">${PLAT_ICON[o.platform] || ''}${o.platform === 'shopee' ? 'Shopee' : 'TikTok'}</span>
+      </span>
+      <span class="oc-name" style="display:block" title="${esc(o.item_name)}">${esc(o.item_name)}</span>
+      <span class="oc-meta">
+        <span class="num">${Number(o.amount_vnd).toLocaleString('vi-VN')}đ · ${esc(o.delivered_days_ago)} ngày</span>
+        <span>${o.modified_after_order ? '<span class="tag-mod">Shop sửa mô tả</span>' : (o.buyer_returns_90d >= 3 ? '<span class="tag-mod">Hoàn ' + esc(o.buyer_returns_90d) + ' lần</span>' : esc(o.category))}</span>
+      </span>
+    </button>
   `).join("");
 }
 
@@ -243,7 +409,12 @@ function selectOrder(oid) {
   renderOrders();
   const box = document.getElementById("msgInput");
   if (!box.value.includes(oid)) {
-    box.value = ("Đơn " + oid + " " + box.value.replace(/\bORD-\d+\b/gi, "").trim()).trim();
+    // Xoá cả cụm "Đơn ORD-xxx" cũ + dọn chữ "Đơn" thừa ở đầu, rồi mới chèn mã mới (tránh "Đơn Đơn Đơn…")
+    const rest = box.value
+      .replace(/(?:Đơn\s+)?ORD-\d+/gi, " ")
+      .replace(/^(?:\s*Đơn(?=\s|$))+/i, "")
+      .replace(/\s+/g, " ").trim();
+    box.value = ("Đơn " + oid + " " + rest).trim();
   }
 }
 
@@ -260,10 +431,23 @@ function usePreset(oid, msg) {
 
 function switchTab(tab) {
   currentTab = tab;
-  document.getElementById("tabBuyerBtn").classList.toggle("active", tab === "buyer");
-  document.getElementById("tabSellerBtn").classList.toggle("active", tab === "seller");
+  const b = document.getElementById("tabBuyerBtn"), s = document.getElementById("tabSellerBtn");
+  b.classList.toggle("active", tab === "buyer"); b.setAttribute("aria-pressed", tab === "buyer");
+  s.classList.toggle("active", tab === "seller"); s.setAttribute("aria-pressed", tab === "seller");
   document.getElementById("buyerView").classList.toggle("hidden", tab !== "buyer");
   document.getElementById("sellerView").classList.toggle("hidden", tab !== "seller");
+  renderRoleTag();
+}
+
+// Nhãn "Đang xem" + màu vai (body[data-role]) — có chữ đi kèm, không chỉ dựa vào màu
+const ROLE_ICON = {
+  buyer: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  seller: '<path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v8h14v-8"/><path d="M10 21v-5h4v5"/>',
+};
+function renderRoleTag() {
+  document.body.dataset.role = currentTab;
+  document.getElementById("roleTag").innerHTML = svg(ROLE_ICON[currentTab]) +
+    (currentTab === "seller" ? "Đang xem: Góc nhìn Người bán" : "Đang xem: Góc nhìn Người mua");
 }
 
 async function resetSession() {
@@ -283,9 +467,9 @@ async function resetSession() {
 async function sendChat() {
   const input = document.getElementById("msgInput");
   const msg = input.value.trim();
-  if (!msg) return;
-  const btn = document.getElementById("sendBtn");
-  btn.disabled = true; btn.textContent = "Đang xử lý...";
+  if (!msg) { input.focus(); return; }
+  const btn = document.getElementById("sendBtn"), label = document.getElementById("sendLabel");
+  btn.disabled = true; label.textContent = "Đang đối chiếu…";
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
@@ -295,8 +479,12 @@ async function sendChat() {
     const data = await res.json();
     renderResult(msg, data);
   } finally {
-    btn.disabled = false; btn.textContent = "Gửi yêu cầu";
+    btn.disabled = false; label.textContent = "Gửi yêu cầu";
   }
+}
+
+function pill(ok, text) {
+  return `<span class="check-pill ${ok ? 'good' : 'bad'}">${ok ? ICON.check : ICON.cross}<span class="sr-only">${ok ? 'Đạt' : 'Không đạt'}: </span>${text}</span>`;
 }
 
 function renderResult(userMsg, data) {
@@ -305,49 +493,52 @@ function renderResult(userMsg, data) {
   document.getElementById("buyerEmpty").classList.add("hidden");
   document.getElementById("buyerResult").classList.remove("hidden");
 
+  const code = data.error ? "danger" : (meta.decision_code || "ok");
   const badge = document.getElementById("decisionBadge");
-  badge.className = "badge " + (meta.decision_code || "ok");
-  badge.textContent = meta.decision_label || "Đã xử lý";
+  badge.className = "verdict " + code;
+  badge.innerHTML = (ICON[code] || ICON.ok) + `<span>${esc(data.error ? "Lỗi: " + data.error : (stripEmoji(meta.decision_label) || "Đã xử lý"))}</span>`;
   document.getElementById("replyText").textContent = data.output || "";
 
   const evGrid = document.getElementById("evidenceGrid");
   const rulePills = document.getElementById("rulePills");
   if (meta.order && meta.listing) {
     evGrid.classList.remove("hidden");
+    const modified = Boolean(meta.listing.modified_after_order);
     document.getElementById("atOrderText").textContent = meta.listing.listing_at_order;
-    document.getElementById("currentText").textContent = meta.listing.listing_current + (meta.listing.modified_after_order ? " ⚠️ (Đã sửa sau khi bán!)" : "");
-    document.getElementById("currentCard").classList.toggle("alert", Boolean(meta.listing.modified_after_order));
+    document.getElementById("currentText").innerHTML = esc(meta.listing.listing_current) +
+      (modified ? `<div class="mod-note">${ICON.warn}Shop đã sửa mô tả sau khi bán — đối chiếu theo bản lúc đặt</div>` : "");
+    document.getElementById("currentCard").classList.toggle("alert", modified);
 
     const r = meta.rules || {};
     const h = meta.history || {};
     const flags = r.flags || [];
     const pills = [
-      `<span class="check-pill ${flags.includes('expired_return_window') ? 'bad' : 'good'}">Hạn sàn: ${r.days_since_delivery}/${r.max_days} ngày</span>`,
-      `<span class="check-pill ${flags.includes('over_auto_limit_300k') ? 'bad' : 'good'}">Giá trị: ${Number(r.amount_vnd || 0).toLocaleString('vi-VN')}đ / 300.000đ</span>`,
-      `<span class="check-pill ${h.is_serial_returner ? 'bad' : 'good'}">Lịch sử hoàn 90d: ${h.returns_90d || 0}/${h.total_orders_90d || 0} đơn</span>`,
-      `<span class="check-pill ${flags.includes('pii_request') ? 'bad' : 'good'}">Bảo vệ PII: 0% lộ SĐT/địa chỉ</span>`
+      pill(!flags.includes('expired_return_window'), `Hạn sàn: ${esc(r.days_since_delivery)}/${esc(r.max_days)} ngày`),
+      pill(!flags.includes('over_auto_limit_300k'), `Giá trị: ${Number(r.amount_vnd || 0).toLocaleString('vi-VN')}đ / 300.000đ`),
+      pill(!h.is_serial_returner, `Lịch sử hoàn 90d: ${esc(h.returns_90d || 0)}/${esc(h.total_orders_90d || 0)} đơn`),
+      pill(!flags.includes('pii_request'), `Bảo vệ PII: 0% lộ SĐT/địa chỉ`),
     ];
-    if (meta.ticket) pills.push(`<span class="check-pill bad">Phiếu chuyển: ${meta.ticket.ticket_id}</span>`);
+    if (meta.ticket) pills.push(`<span class="check-pill bad">${ICON.human}Phiếu chuyển: ${esc(meta.ticket.ticket_id)}</span>`);
     rulePills.innerHTML = pills.join("");
   } else {
     evGrid.classList.add("hidden");
-    rulePills.innerHTML = `<span class="check-pill bad">Flags: ${(meta.flags || []).join(", ") || "none"}</span>`;
+    rulePills.innerHTML = `<span class="check-pill bad">${ICON.cross}Flags: ${esc((meta.flags || []).join(", ") || "none")}</span>`;
   }
 
   document.getElementById("traceBar").innerHTML = `
-    <span><strong>Model:</strong> ${(ts.models || []).join(", ") || "fake"}</span>
-    <span><strong>Gọi model:</strong> ${ts.model_calls || 0} lần</span>
-    <span><strong>Công cụ (@tool):</strong> ${ts.tool_calls || 0} lần</span>
-    <span><strong>Tokens:</strong> ${ts.tokens_in || 0} in / ${ts.tokens_out || 0} out</span>
-    <span><strong>Thời gian:</strong> ${data.latency_ms || 0} ms</span>
+    <span><b>model</b> ${esc((ts.models || []).join(", ") || "fake")}</span>
+    <span><b>gọi model</b> ${esc(ts.model_calls || 0)}</span>
+    <span><b>@tool</b> ${esc(ts.tool_calls || 0)}</span>
+    <span><b>token</b> ${esc(ts.tokens_in || 0)} in / ${esc(ts.tokens_out || 0)} out</span>
+    <span><b>thời gian</b> ${esc(data.latency_ms || 0)} ms</span>
   `;
 
   if (meta.seller_view) {
     document.getElementById("sellerEmpty").classList.add("hidden");
     document.getElementById("sellerResult").classList.remove("hidden");
     const sv = meta.seller_view;
-    document.getElementById("sellerStatusBadge").textContent = sv.shop_id + " · " + sv.protection_status;
-    document.getElementById("sellerNotes").innerHTML = (sv.risk_notes || []).map(n => `<li>${n}</li>`).join("");
+    document.getElementById("sellerStatusBadge").innerHTML = ICON.shield + `<span>${esc(sv.shop_id + " · " + sv.protection_status)}</span>`;
+    document.getElementById("sellerNotes").innerHTML = (sv.risk_notes || []).map(n => `<li>${esc(n)}</li>`).join("");
     document.getElementById("sellerSla").textContent = sv.response_sla;
     document.getElementById("sellerPii").textContent = sv.pii_blocked + (sv.ticket_id ? (" · Phiếu: " + sv.ticket_id) : "");
   } else {
@@ -357,9 +548,10 @@ function renderResult(userMsg, data) {
 
   const hlog = document.getElementById("historyLog");
   hlog.classList.remove("hidden");
-  hlog.innerHTML = `<strong>Session Memory (${data.turns} lượt trong phiên):</strong> Lượt gần nhất: "${userMsg.slice(0, 90)}"`;
+  hlog.innerHTML = `<strong>Session Memory (${esc(data.turns)} lượt trong phiên):</strong> Lượt gần nhất: "${esc(userMsg.slice(0, 90))}"`;
 }
 
+renderRoleTag();
 init();
 </script>
 </body>
