@@ -1,0 +1,32 @@
+{
+  "reference_date": "2026-11-27",
+  "auto_approve_limit_vnd": 300000,
+  "serial_return_threshold": 3,
+  "platforms": {
+    "shopee": {
+      "name": "Shopee",
+      "return_window_days": 15,
+      "change_of_mind_allowed": true,
+      "change_of_mind_days": 15,
+      "change_of_mind_requires": "Sản phẩm còn nguyên tem mác, chưa qua sử dụng, không thuộc danh mục loại trừ.",
+      "defect_requires_unbox_video": true,
+      "source_note": "Trang trợ giúp trả hàng/hoàn tiền Shopee (hạn 15 ngày phần lớn đơn, kiểm 11/11/2026)."
+    },
+    "tiktok": {
+      "name": "TikTok Shop",
+      "return_window_days": 15,
+      "change_of_mind_allowed": true,
+      "change_of_mind_days": 6,
+      "change_of_mind_requires": "Áp dụng trong 6 ngày sau giao đối với sản phẩm không thuộc Mall nếu còn nguyên seal/tem.",
+      "defect_requires_unbox_video": true,
+      "source_note": "Trung tâm người bán / trợ giúp trả hàng TikTok Shop (hạn 6 ngày đổi ý shop thường, 15 ngày lỗi/Mall)."
+    }
+  },
+  "escalation_triggers": [
+    "Giá trị đơn vượt hạn mức tự hướng dẫn/duyệt 300.000đ",
+    "Quá hạn trả hàng theo chính sách sàn",
+    "Nghi ngờ hàng giả / hàng nhái hoặc đòi khoá shop / bồi thường ngoài giá đơn",
+    "Tài khoản có lịch sử hoàn >= 3 lần trong 90 ngày (serial returner)",
+    "Người mua đòi thông tin cá nhân (SĐT, địa chỉ) của người bán hoặc đe doạ bóc phốt / 1 sao"
+  ]
+}
