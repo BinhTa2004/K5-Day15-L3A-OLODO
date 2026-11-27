@@ -9,10 +9,10 @@
 
 ## 2. Bộ câu thử dựng ra sao
 
-- `eval/benchmark.csv`: **15 câu tại CP2** (`thuong 6 · kho 6 · tu_choi 3`, trong đó có 2 câu tấn công; CP3 sẽ mở rộng lên 24–25 câu).
-- Nguồn: `nguoi_dung 0 · data_that 8 · tu_viet 7 · sinh_seed 0` → từ người dùng / data thật: **8/15 (53,3%, đạt ngưỡng ≥1/3)**. *(CP3 bổ sung thêm câu từ phỏng vấn `nguoi_dung: P1..P3`).*
-- Độ phủ — lưới input 4 chiều: (1) Sàn (`Shopee` vs `TikTok`), (2) Loại lý do (`sai size / không khớp mô tả / thiếu hàng / hư hỏng / sai mẫu / đổi ý / nghi giả`), (3) Trạng thái bằng chứng & lịch sử (`đủ video` vs `thiếu bằng chứng` vs `shop sửa mô tả` vs `serial returner >=3`), (4) Hành vi mong đợi (`hướng dẫn trả hàng / hỏi lại / yêu cầu bổ sung / từ chối + chuyển người`).
-- Câu `kho` trỏ về 4 lớp chỗ khó (`spec.md` §5): lớp 1 (`D09`, `D10`) · lớp 2 (`D07`, `D08`) · lớp 3 (`D13`, `D14`, `D15`) · lớp 4 (`D10`, `D11`, `D12`).
+- `eval/benchmark.csv`: **25 câu (CP3)** (`thuong 10 · kho 10 · tu_choi 5`, trong đó có 4 câu tấn công / ngoài thẩm quyền `D13, D14, D18, D19`)
+- Nguồn: `nguoi_dung 7 · data_that 8 · tu_viet 10 · sinh_seed 0` → từ người dùng / data thật: **15/25 (60,0%, đạt ngưỡng ≥1/3)**.
+- Độ phủ — lưới input 4 chiều: (1) Sàn (`Shopee` vs `TikTok`), (2) Loại lý do (`sai size / không khớp mô tả / thiếu hàng / hư hỏng / sai mẫu / đổi ý / nghi giả`), (3) Trạng thái bằng chứng & lịch sử (`đủ video` vs `thiếu bằng chứng` vs `shop sửa mô tả` vs `serial returner >=3` vs `mã đơn không tồn tại`), (4) Hành vi mong đợi (`hướng dẫn trả hàng / hỏi lại / yêu cầu bổ sung / từ chối + chuyển người`).
+- Câu `kho` trỏ về 4 lớp chỗ khó (`spec.md` §5): lớp 1 (`D09, D10, D16, D20`) · lớp 2 (`D07, D08`) · lớp 3 (`D13, D14, D15, D18, D19`) · lớp 4 (`D10, D11, D12, D17, D22`).
 
 ## 3. Metric và cách chấm
 

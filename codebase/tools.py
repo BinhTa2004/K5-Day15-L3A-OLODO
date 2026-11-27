@@ -2,6 +2,7 @@
 
 Mỗi công cụ gắn @tool để tracing.py tự ghi trace (tên, input, output, thời gian, lỗi).
 Dữ liệu nền đọc từ data/orders.json và data/policies.json (synthetic, seed=42, không PII).
+Mọi quyết định kiểm quy tắc dùng hoàn toàn dữ liệu khách quan (không đọc nhãn gợi ý issue_hint).
 """
 import json
 import os
@@ -17,6 +18,25 @@ def _load_json(filename: str):
         return json.load(f)
 
 
+def list_orders() -> list:
+    """Trả về danh sách đơn hàng sạch để hiển thị trên Web UI (không gắn @tool để khỏi nhiễu trace)."""
+    orders = _load_json("orders.json")
+    return [
+        {
+            "order_id": o["order_id"],
+            "platform": o["platform"],
+            "category": o["category"],
+            "item_name": o["item_name"],
+            "amount_vnd": o["amount_vnd"],
+            "delivered_days_ago": o["delivered_days_ago"],
+            "buyer_id": o["buyer_id"],
+            "buyer_returns_90d": o["buyer_returns_90d"],
+            "modified_after_order": o.get("listing_at_order") != o.get("listing_current"),
+        }
+        for o in orders
+    ]
+
+
 @tool
 def get_order(order_id: str) -> dict:
     """Tra cứu thông tin đơn hàng theo mã đơn sạch (ORD-XXX).
@@ -25,7 +45,9 @@ def get_order(order_id: str) -> dict:
     orders = _load_json("orders.json")
     for o in orders:
         if o["order_id"].upper() == oid:
-            return {"found": True, **o}
+            clean = dict(o)
+            clean.pop("issue_hint", None)
+            return {"found": True, **clean}
     return {"found": False, "order_id": oid}
 
 
@@ -89,9 +111,9 @@ def get_complaint_history(buyer_id: str) -> dict:
 
 @tool
 def check_return_rules(order_id: str, claimed_reason: str, has_evidence: bool) -> dict:
-    """Bộ kiểm quy tắc cứng bằng code (không dùng AI để tính toán/duyệt hạn mức).
+    """Bộ kiểm quy tắc cứng bằng code (không dùng AI tính toán, không đọc trường issue_hint).
     Input: order_id (str), claimed_reason (str), has_evidence (bool).
-    Output: dict gồm action (guide_return | need_evidence | escalate | reject_expired | reject_pii_or_scope | neutral_explain) và flags chi tiết. Không tác động ra ngoài."""
+    Output: dict gồm action (guide_return | need_evidence | escalate | reject_expired | reject_policy_or_pii | reject_and_escalate) và flags chi tiết. Không tác động ra ngoài."""
     oid = (order_id or "").strip().upper()
     orders = _load_json("orders.json")
     policies = _load_json("policies.json")
@@ -106,15 +128,15 @@ def check_return_rules(order_id: str, claimed_reason: str, has_evidence: bool) -
     serial_thresh = policies["serial_return_threshold"]
     days = int(order["delivered_days_ago"])
 
-    is_change_mind = any(k in text_l for k in ("đổi ý", "không thích", "không hợp", "không còn nhu cầu")) or order.get("issue_hint") == "doi_y" or order.get("issue_hint") == "qua_han_doi_y_tiktok"
+    is_change_mind = any(k in text_l for k in ("đổi ý", "không thích", "không hợp", "không còn nhu cầu"))
     max_days = plat_pol["change_of_mind_days"] if is_change_mind else plat_pol["return_window_days"]
 
     flags = []
-    if any(k in text_l for k in ("số điện thoại", "sđt", "sdt", "địa chỉ nhà", "địa chỉ shop")):
+    if any(k in text_l for k in ("số điện thoại", "sđt", "sdt", "số đt", "địa chỉ nhà", "địa chỉ shop", "địa chỉ riêng")):
         flags.append("pii_request")
-    if any(k in text_l for k in ("1 sao", "bóc phốt", "phốt", "không trả hàng")):
+    if any(k in text_l for k in ("bóc phốt", "không cần trả hàng", "không trả hàng", "nếu không duyệt")):
         flags.append("threat_or_refund_without_return")
-    if any(k in text_l for k in ("hàng giả", "nhái", "fake")):
+    if any(k in text_l for k in ("hàng giả", "nhái", "fake", "nghi giả")):
         flags.append("suspected_counterfeit")
     if any(k in text_l for k in ("khoá", "khóa", "chặn tài khoản", "bồi thường thêm")):
         flags.append("out_of_scope_penalty_or_compensation")
@@ -128,8 +150,6 @@ def check_return_rules(order_id: str, claimed_reason: str, has_evidence: bool) -
         flags.append("listing_modified_after_order")
     if not has_evidence:
         flags.append("missing_evidence")
-    if order.get("issue_hint") == "shop_dung_mo_ta":
-        flags.append("matches_listing_at_order")
 
     if "pii_request" in flags or "out_of_scope_penalty_or_compensation" in flags or "threat_or_refund_without_return" in flags:
         action = "reject_and_escalate" if ("over_auto_limit_300k" in flags or "suspected_counterfeit" in flags) else "reject_policy_or_pii"
@@ -141,8 +161,6 @@ def check_return_rules(order_id: str, claimed_reason: str, has_evidence: bool) -
         action = "escalate"
     elif "missing_evidence" in flags:
         action = "need_evidence"
-    elif "matches_listing_at_order" in flags:
-        action = "neutral_explain"
     else:
         action = "guide_return"
 

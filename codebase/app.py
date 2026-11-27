@@ -1,8 +1,6 @@
-"""Khung chạy bản chạy thử tối thiểu (dòng lệnh): gõ đầu vào → answer() trong agent.py → in kết quả.
+"""Điểm chạy bản chạy thử: mặc định mở Web UI Demo 2 góc nhìn qua `python run.py`.
 
-Chạy bằng: python run.py   (macOS/Linux có thể là python3, Windows có thể là py)
-Nhóm thay bằng giao diện của mình (web, bot…) nhưng giữ `python run.py` là lệnh duy nhất
-để chạy bản chạy thử (sửa hàm run_app() trong run.py nếu cần).
+Khi chạy với cờ `--cli` hoặc truyền stdin tự động (pipe), chạy chế độ dòng lệnh tối thiểu.
 """
 import os
 import sys
@@ -17,7 +15,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
 def _where(e):
-    """File (trong codebase/) gây lỗi khi nạp: SyntaxError có e.filename, lỗi khác lấy khung cuối của traceback."""
     import traceback
     path = getattr(e, "filename", None) or (traceback.extract_tb(e.__traceback__)[-1].filename if e.__traceback__ else "")
     if not path:
@@ -26,15 +23,16 @@ def _where(e):
     base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.relpath(p, base).replace(os.sep, "/") if p.startswith(base) else path
 
-def main() -> int:
+
+def run_cli() -> int:
     try:
         import tracing
         from agent import answer
-    except Exception as e:  # lỗi cú pháp, thiếu thư viện… trong codebase/
+    except Exception as e:
         print("Không nạp được codebase/ — lỗi ở %s: %s: %s" % (_where(e), type(e).__name__, e))
         print("Sửa lỗi rồi chạy lại. Cách nối model: docs/connect-model.md")
         return 1
-    print("Bản chạy thử — gõ đầu vào rồi Enter. Thoát: Ctrl+C (hoặc Enter 2 lần với dòng trống).")
+    print("Bản chạy thử (CLI) — gõ đầu vào rồi Enter. Thoát: Ctrl+C (hoặc Enter 2 lần với dòng trống).")
     blank = 0
     while True:
         try:
@@ -55,7 +53,7 @@ def main() -> int:
             tracing.end()
             print("Chưa nối model: %s" % e)
             return 1
-        except Exception as e:  # lỗi gọi model: báo rồi cho hỏi tiếp
+        except Exception as e:
             tracing.end()
             print("[lỗi] %s: %s" % (type(e).__name__, e))
             continue
@@ -63,6 +61,16 @@ def main() -> int:
         print(result.get("output", "") if isinstance(result, dict) else result)
         print("   (model: %s · gọi model %d lần · công cụ %d lần · token vào %d / ra %d)"
               % (", ".join(s["models"]) or "—", s["model_calls"], s["tool_calls"], s["tokens_in"], s["tokens_out"]))
+
+
+def main() -> int:
+    if "--cli" not in sys.argv and sys.stdin.isatty():
+        try:
+            from web_ui import run_server
+            return run_server()
+        except Exception as e:
+            print("Không mở được Web UI (%s), chuyển về CLI..." % e)
+    return run_cli()
 
 
 if __name__ == "__main__":
