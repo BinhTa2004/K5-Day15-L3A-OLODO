@@ -89,7 +89,7 @@ Nhóm dùng stack khác (Node, Streamlit, notebook…): sửa hàm `run_app()` t
 
 2–3 dòng (bắt buộc): nhóm dùng công cụ AI nào để làm gì, người kiểm lại phần nào. Chi tiết: [docs/ai-usage.md](docs/ai-usage.md). Coding agent đọc [AGENTS.md](AGENTS.md).
 
-Nhóm dùng coding agent hỗ trợ viết khung code (`codebase/agent.py`, `tools.py`, `ai.py`, `web_ui.py`), script SQL khám phá dữ liệu (`evidence/count_xomdata.sql`) và rà lỗi kỹ thuật. Toàn bộ số liệu bằng chứng (`vietnam_ecommerce` + khảo sát `n=32`), lựa chọn lát cắt, chuẩn metric/câu thử và chấm cột `pass` trong `eval/run-1.csv` đều do thành viên nhóm kiểm chứng trực tiếp và chịu trách nhiệm.
+Nhóm dùng coding agent hỗ trợ viết khung code (`codebase/agent.py`, `tools.py`, `ai.py`, `web_ui.py`), script SQL khám phá dữ liệu (`evidence/count_xomdata.sql`) và rà lỗi kỹ thuật. Toàn bộ số liệu bằng chứng (`vietnam_ecommerce` + khảo sát `n=32`), lựa chọn lát cắt, chuẩn metric/câu thử, chấm cột `pass` trong `eval/run-1..3.csv` và đối chiếu mô phỏng `cost/simulate-1.csv` đều do thành viên nhóm kiểm chứng trực tiếp và chịu trách nhiệm.
 
 ## File mẫu — điền ở bước nào
 

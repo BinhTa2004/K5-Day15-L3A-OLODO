@@ -53,4 +53,4 @@
 ## 5. Giới hạn của data
 
 Data `vietnam_ecommerce` cho biết **chuyện gì xảy ra ở mức đơn/dòng hàng** (tần suất hoàn, lý do chuẩn hoá trên sàn, thiệt hại tiền về, hành vi hoàn lặp lại), nhưng **không cho biết vì sao người mua lúng túng khi gửi yêu cầu/bằng chứng** (cột `buyer_remark` và `buyer_message` đều trống 0 dòng, không có transcript chat hay ảnh mở hộp).
-→ **Kiểm lại bằng nguồn thứ 2:** Phỏng vấn **≥3 người mua** và khảo sát **≥20 người mua Shopee/TikTok ngoài nhóm** trong lớp L3 (bộ câu hỏi tại [`evidence/survey/form_questions.md`](survey/form_questions.md), tổng hợp hoàn tất trước CP3).
+→ **Kiểm lại bằng nguồn thứ 2:** Phỏng vấn **≥3 người mua** và khảo sát **≥20 người mua Shopee/TikTok ngoài nhóm** trong lớp L3 (bộ câu hỏi tại [`evidence/survey/questions.md`](survey/questions.md), tổng hợp hoàn tất trước CP3).

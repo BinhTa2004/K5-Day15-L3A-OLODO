@@ -895,7 +895,7 @@ def create_server(host: str = "127.0.0.1", port: int = 8000):
             return ThreadingHTTPServer((host, p), DemoHandler), p
         except OSError as e:
             last_err = e
-    raise last_err
+    raise last_err if last_err is not None else RuntimeError("Không mở được cổng Web UI")
 
 
 def run_server(host: str = "127.0.0.1", port: int = 8000, open_browser: bool = True) -> int:
