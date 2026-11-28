@@ -56,7 +56,7 @@ def _detect_early_pii_or_scope(text: str) -> list:
     flags = []
     if any(k in tl for k in ("số điện thoại", "sđt", "sdt", "số đt", "địa chỉ nhà", "địa chỉ shop", "địa chỉ riêng")):
         flags.append("pii_request")
-    if any(k in tl for k in ("khoá", "khóa", "chặn tài khoản", "bồi thường thêm")):
+    if re.search(r"(?<!\w)(?:khoá|khóa)(?!\w)", tl) or any(k in tl for k in ("chặn tài khoản", "bồi thường thêm")):
         flags.append("out_of_scope_penalty_or_compensation")
     return flags
 

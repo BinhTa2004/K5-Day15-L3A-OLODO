@@ -6,6 +6,7 @@ Mọi quyết định kiểm quy tắc dùng hoàn toàn dữ liệu khách quan
 """
 import json
 import os
+import re
 from tracing import tool, TOOLS  # noqa: F401
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -144,7 +145,7 @@ def check_return_rules(order_id: str, claimed_reason: str, has_evidence: bool) -
         flags.append("threat_or_refund_without_return")
     if any(k in text_l for k in ("hàng giả", "nhái", "fake", "nghi giả")):
         flags.append("suspected_counterfeit")
-    if any(k in text_l for k in ("khoá", "khóa", "chặn tài khoản", "bồi thường thêm")):
+    if re.search(r"(?<!\w)(?:khoá|khóa)(?!\w)", text_l) or any(k in text_l for k in ("chặn tài khoản", "bồi thường thêm")):
         flags.append("out_of_scope_penalty_or_compensation")
     if days > max_days:
         flags.append("expired_return_window")
