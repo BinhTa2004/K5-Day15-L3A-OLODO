@@ -30,7 +30,13 @@ def list_orders() -> list:
             "amount_vnd": o["amount_vnd"],
             "delivered_days_ago": o["delivered_days_ago"],
             "buyer_id": o["buyer_id"],
+            "buyer_total_orders_90d": o.get("buyer_total_orders_90d", 0),
             "buyer_returns_90d": o["buyer_returns_90d"],
+            "shop_id": o.get("shop_id", "SHOP"),
+            "evidence_status": o.get("evidence_status", ""),
+            "missing_evidence": "chưa cung cấp" in (o.get("evidence_status") or "").lower(),
+            "over_limit_300k": int(o["amount_vnd"]) > 300000,
+            "over_15d": int(o["delivered_days_ago"]) > 15,
             "modified_after_order": o.get("listing_at_order") != o.get("listing_current"),
         }
         for o in orders

@@ -35,9 +35,12 @@
 
 | Lượt | Run ID | Model | Cấu hình (prompt / công cụ / thay đổi) | Đạt / tổng | % | Đạt chuẩn? |
 |---|---|---|---|---|---|---|
-| 1 | run-1@20261128-011859 | gpt-oss:20b | Khung CP2 trên main (6 tool + check_return_rules, chưa có chặn PII sớm/ép tiếng Việt) | 20/25 | 80,0% | Chưa đạt (tu_choi 3/5 = 60%, trượt D09/D10 đối chiếu mô tả) |
-| 2 | | | | __/__ | | |
+| 1 | `run-1@20261128-011859` | `gpt-oss:20b` | Khung CP2 trên main (6 tool + check_return_rules, chưa có chặn PII sớm/ép tiếng Việt) | 20/25 | 80% | Chưa đạt (`tu_choi` 3/5 = 60%, trượt `D09, D10` đối chiếu mô tả) |
+| 2 | `run-2@20261128-100823` | `gpt-oss:20b` | Chặn PII sớm + bỏ `issue_hint` + tự gắn `ESC-ORD-...` + ép 100% tiếng Việt & trích nguyên văn `listing_at_order` | 24/25 | 96% | **Đạt chuẩn CP2** (`thuong` 9/10 · `kho` 10/10 · `tu_choi` 5/5) |
+| 3 | `run-3@20261128-103212` | `gpt-oss:20b` | Tinh chỉnh quy tắc hư hỏng vận chuyển (`D21`) & tách mốc TikTok 6 ngày đổi ý / 15 ngày lỗi (`D17`) | 25/25 | 100% | **Đạt chuẩn CP2** (`thuong` 10/10 · `kho` 10/10 · `tu_choi` 5/5) |
 
 ## 6. Lỗi chính *(cập nhật ở CP4)*
 
-*(Điền sau khi chạy lượt 1 và lượt 2 bằng AI thật.)*
+- **Lượt 1 (`20/25 = 80%`, chưa đạt chuẩn):** Lộ 4 nhóm lỗi thật — (1) bỏ sót từ chối PII khi thiếu mã đơn (`D19`), (2) thiếu/sai trích dẫn `listing_at_order` và bịa phí 20%+2% (`D09, D10`), (3) trả lời tiếng Anh cho khách Việt (`D06, D18`), (4) lộ tên flag nội bộ & đòi email/SĐT (`D13, D15, D22, D25`).
+- **Lượt 2 (`24/25 = 96%`, đạt chuẩn CP2):** Khắc phục dứt điểm nhóm `tu_choi` (`3/5 → 5/5`), nhóm đối chiếu `listing_at_order` (`D09, D10`) và lỗi tiếng Anh/lộ flag nội bộ (`0/25`); còn hồi quy nhẹ ở `D21`.
+- **Lượt 3 (`25/25 = 100%`, đạt chuẩn CP2):** Khắc phục nốt `D21` (khẳng định bảo vệ hư hỏng vận chuyển) và tách mốc hạn TikTok `D17`; chỉ còn lỗi gõ nhỏ `260 000 đ > 300 000 đ` ở `D15` không làm sai quyết định chuyển `ESC-ORD-007`; xem chi tiết tại [`eval/report.md`](report.md).
